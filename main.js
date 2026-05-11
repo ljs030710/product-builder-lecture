@@ -23,6 +23,19 @@ class LottoGenerator extends HTMLElement {
         button.textContent = '번호 생성';
         button.addEventListener('click', () => this.generateNumbers(numbersContainer));
 
+        const formContainer = document.createElement('div');
+        formContainer.setAttribute('class', 'form-container');
+        formContainer.innerHTML = `
+            <div class="divider"></div>
+            <h2>제휴 문의</h2>
+            <form action="https://formspree.io/f/xnjwlnvg" method="POST">
+                <input type="text" name="name" placeholder="성함 / 업체명" required>
+                <input type="email" name="_replyto" placeholder="이메일 주소" required>
+                <textarea name="message" placeholder="문의 내용을 입력해주세요" required></textarea>
+                <button type="submit" class="submit-btn">문의 보내기</button>
+            </form>
+        `;
+
         const style = document.createElement('style');
         style.textContent = `
             :host {
@@ -30,18 +43,24 @@ class LottoGenerator extends HTMLElement {
                 --text-color: white;
                 --number-bg: white;
                 --btn-shadow: rgba(0,0,0,0.2);
+                --input-bg: rgba(255, 255, 255, 0.9);
+                --input-text: #333;
             }
             :host([theme="dark"]) {
                 --bg-color: #1a1a1a;
                 --text-color: #f0f0f0;
                 --number-bg: #333;
                 --btn-shadow: rgba(255,255,255,0.1);
+                --input-bg: #2a2a2a;
+                --input-text: #f0f0f0;
             }
             :host([theme="light"]) {
                 --bg-color: #f7f7f7;
                 --text-color: #333;
                 --number-bg: white;
                 --btn-shadow: rgba(0,0,0,0.1);
+                --input-bg: white;
+                --input-text: #333;
             }
             .wrapper {
                 display: flex;
@@ -55,6 +74,8 @@ class LottoGenerator extends HTMLElement {
                 text-align: center;
                 transition: background 0.3s ease, color 0.3s ease;
                 position: relative;
+                padding: 4rem 1rem;
+                box-sizing: border-box;
             }
             .theme-toggle {
                 position: absolute;
@@ -114,13 +135,61 @@ class LottoGenerator extends HTMLElement {
                 box-shadow: 0 5px 15px var(--btn-shadow);
                 transition: all 0.3s ease;
                 font-family: 'Nanum Pen Script', cursive;
+                margin-bottom: 3rem;
             }
             .generate-btn:hover {
                 box-shadow: 0 8px 25px var(--btn-shadow);
                 transform: translateY(-2px);
             }
-            .generate-btn:active {
-                transform: translateY(1px);
+            
+            .form-container {
+                width: 100%;
+                max-width: 400px;
+                margin-top: 2rem;
+            }
+            .divider {
+                height: 1px;
+                background: var(--text-color);
+                opacity: 0.3;
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+            h2 {
+                font-size: 2.5rem;
+                margin-bottom: 1.5rem;
+                font-family: 'East Sea Dokdo', cursive;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            input, textarea {
+                padding: 0.8rem;
+                border-radius: 10px;
+                border: 1px solid rgba(0,0,0,0.1);
+                background: var(--input-bg);
+                color: var(--input-text);
+                font-family: 'Nanum Pen Script', cursive;
+                font-size: 1.2rem;
+            }
+            textarea {
+                height: 100px;
+                resize: none;
+            }
+            .submit-btn {
+                padding: 0.8rem;
+                border: none;
+                border-radius: 10px;
+                background: #2575fc;
+                color: white;
+                font-size: 1.3rem;
+                cursor: pointer;
+                font-family: 'Nanum Pen Script', cursive;
+                transition: opacity 0.3s;
+            }
+            .submit-btn:hover {
+                opacity: 0.9;
             }
         `;
 
@@ -130,6 +199,7 @@ class LottoGenerator extends HTMLElement {
         wrapper.appendChild(title);
         wrapper.appendChild(numbersContainer);
         wrapper.appendChild(button);
+        wrapper.appendChild(formContainer);
 
         this.initTheme();
         this.generateNumbers(numbersContainer);
