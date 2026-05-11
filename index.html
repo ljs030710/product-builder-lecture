@@ -4,131 +4,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 서비스 플랫폼</title>
+    <title>AI 서비스 플랫폼 | 로또 생성기 & 인공지능 동물상 테스트</title>
+    <meta name="description" content="인공지능(AI)을 활용한 동물상 테스트와 행운의 로또 번호 생성기를 무료로 이용하세요. 최신 머신러닝 기술로 분석하는 재미있는 동물상 찾기 서비스를 제공합니다.">
+    <meta name="keywords" content="동물상 테스트, 로또 번호 생성기, AI 테스트, 강아지상 고양이상, 인공지능 서비스, 무료 로또 생성">
     <meta name="google-adsense-account" content="ca-pub-2761348631379342">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2761348631379342" crossorigin="anonymous"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
     <style>
-        nav {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 1rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
+        :root {
+            --primary-color: #ff416c;
+            --secondary-color: #2575fc;
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-gray: #f8f9fa;
         }
-        nav a {
-            text-decoration: none;
-            color: #333;
-            font-family: 'Nanum Pen Script', cursive;
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        nav a:hover, nav a.active {
-            color: #ff416c;
-        }
-        .content-section {
-            display: none;
-            padding-top: 60px;
-            width: 100%;
-        }
-        .content-section.active {
-            display: block;
-        }
-        #disqus_container {
-            width: 100%;
-            max-width: 800px;
-            margin: 2rem auto;
-        }
-        .ad-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 1rem auto;
-            text-align: center;
-            overflow: hidden;
-        }
+        body { font-family: 'Noto Sans KR', sans-serif; line-height: 1.6; color: var(--text-dark); background-color: var(--bg-gray); margin: 0; }
+        header { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: fixed; top: 0; width: 100%; z-index: 1000; }
+        nav { max-width: 1000px; margin: 0 auto; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'East Sea Dokdo', cursive; font-size: 2.5rem; color: var(--primary-color); text-decoration: none; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; cursor: pointer; transition: color 0.3s; font-size: 1.1rem; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-color); }
+        main { max-width: 900px; margin: 100px auto 3rem; padding: 0 1rem; }
+        .content-section { display: none; background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .content-section.active { display: block; }
+        .info-article { margin-top: 3rem; padding: 2rem; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .info-article h3 { color: var(--secondary-color); border-left: 5px solid var(--secondary-color); padding-left: 1rem; margin-bottom: 1.5rem; }
+        .info-article p { color: var(--text-light); margin-bottom: 1rem; }
+        .ad-container { width: 100%; margin: 2rem auto; text-align: center; background: #eee; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        footer { background: #333; color: white; padding: 3rem 1rem; text-align: center; margin-top: 5rem; }
+        .footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; }
+        .footer-links a { color: #ccc; text-decoration: none; font-size: 0.9rem; }
+        .footer-links a:hover { color: white; }
     </style>
 </head>
 <body>
-    <nav>
-        <a id="nav-lotto" class="active">로또 생성기</a>
-        <a id="nav-animal">동물상 테스트</a>
-    </nav>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">AI 서비스 플랫폼</a>
+            <div class="nav-links">
+                <a id="nav-lotto" class="active">로또 생성기</a>
+                <a id="nav-animal">동물상 테스트</a>
+                <a id="nav-about">소개</a>
+            </div>
+        </nav>
+    </header>
 
-    <div class="ad-container" style="margin-top: 80px;">
-        <!-- 상단 광고 -->
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-2761348631379342"
-             data-ad-slot="responsive"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
+    <main>
+        <div class="ad-container">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2761348631379342" data-ad-slot="responsive" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
 
-    <div id="section-lotto" class="content-section active">
-        <lotto-generator></lotto-generator>
-    </div>
+        <div id="section-lotto" class="content-section active">
+            <lotto-generator></lotto-generator>
+            <article class="info-article">
+                <h3>왜 로또 번호 생성기를 사용해야 할까요?</h3>
+                <p>로또 6/45는 매회 약 814만 분의 1이라는 희박한 확률을 뚫어야 하는 게임입니다. 많은 통계학자들은 번호의 패턴을 분석하려 노력하지만, 로또는 독립 시행 확률이므로 매 회차가 새로운 무작위 결과입니다.</p>
+                <p>로또 생성기는 인간의 편향성(기념일, 선호 숫자 등)을 배제하고 완전히 무작위적인 조합을 만들어줍니다. 이는 다른 사람들과 겹치는 번호를 피할 가능성을 높여주며, 혹시 모를 당첨 시 수령액을 나누지 않을 확률을 높여주는 전략적인 도구로 활용될 수 있습니다.</p>
+            </article>
+        </div>
 
-    <div id="section-animal" class="content-section">
-        <animal-test></animal-test>
-    </div>
-    
-    <div class="ad-container">
-        <!-- 하단 광고 -->
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-2761348631379342"
-             data-ad-slot="responsive"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
+        <div id="section-animal" class="content-section">
+            <animal-test></animal-test>
+            <article class="info-article">
+                <h3>인공지능이 판단하는 동물상의 특징</h3>
+                <p>인공지능은 수만 장의 인물 데이터를 학습하여 얼굴의 구조적 특징을 분석합니다. 강아지상은 주로 동그란 눈매와 부드러운 인상을, 고양이상은 날카로운 눈매와 도도한 분위기를 특징으로 합니다.</p>
+                <p>이 서비스는 구글의 머신러닝 기술인 Teachable Machine을 활용하여 제작되었습니다. 여러분의 얼굴 데이터를 서버로 전송하지 않고 브라우저 내에서 즉시 연산하므로 개인정보 유출 걱정 없이 안전하게 즐기실 수 있습니다. 친구들과 서로의 동물상을 비교해 보세요!</p>
+            </article>
+        </div>
 
-    <div id="disqus_container">
-        <div id="disqus_thread" style="padding: 2rem; box-sizing: border-box; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
-    </div>
+        <div id="section-about" class="content-section">
+            <h2>AI 서비스 플랫폼 소개</h2>
+            <p>본 플랫폼은 현대인들에게 소소한 즐거움을 주기 위해 구축된 기술 실증형 웹 서비스입니다. 복잡한 가입 절차 없이 누구나 최신 웹 기술과 AI 분석 기능을 무료로 체험할 수 있습니다.</p>
+            <p>우리는 사용자 경험을 최우선으로 생각하며, 빠른 로딩 속도와 직관적인 인터페이스를 제공합니다. 앞으로도 운세 분석, 성격 테스트 등 다양한 인공지능 도구를 추가해 나갈 예정입니다.</p>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-    
+        <div class="ad-container">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2761348631379342" data-ad-slot="responsive" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <div id="disqus_thread"></div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="privacy.html">개인정보처리방침</a>
+            <a href="terms.html">이용약관</a>
+            <a onclick="document.getElementById('nav-about').click()">사이트 소개</a>
+        </div>
+        <p>&copy; 2026 AI 서비스 플랫폼. All rights reserved.</p>
+    </footer>
+
     <script src="main.js"></script>
     <script src="animal-test.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
     <script>
-        const navLotto = document.getElementById('nav-lotto');
-        const navAnimal = document.getElementById('nav-animal');
-        const sectionLotto = document.getElementById('section-lotto');
-        const sectionAnimal = document.getElementById('section-animal');
+        const navItems = {
+            lotto: { nav: document.getElementById('nav-lotto'), section: document.getElementById('section-lotto') },
+            animal: { nav: document.getElementById('nav-animal'), section: document.getElementById('section-animal') },
+            about: { nav: document.getElementById('nav-about'), section: document.getElementById('section-about') }
+        };
 
-        navLotto.addEventListener('click', () => {
-            navLotto.classList.add('active');
-            navAnimal.classList.remove('active');
-            sectionLotto.classList.add('active');
-            sectionAnimal.classList.remove('active');
-        });
+        function switchTab(targetKey) {
+            Object.keys(navItems).forEach(key => {
+                const item = navItems[key];
+                if (key === targetKey) {
+                    item.nav.classList.add('active');
+                    item.section.classList.add('active');
+                } else {
+                    item.nav.classList.remove('active');
+                    item.section.classList.remove('active');
+                }
+            });
+            window.scrollTo(0, 0);
+        }
 
-        navAnimal.addEventListener('click', () => {
-            navAnimal.classList.add('active');
-            navLotto.classList.remove('active');
-            sectionAnimal.classList.add('active');
-            sectionLotto.classList.remove('active');
-        });
+        navItems.lotto.nav.addEventListener('click', () => switchTab('lotto'));
+        navItems.animal.nav.addEventListener('click', () => switchTab('animal'));
+        navItems.about.nav.addEventListener('click', () => switchTab('about'));
 
-        // Disqus Integration
         (function() {
             var d = document, s = d.createElement('script');
             s.src = 'https://ljs030710.disqus.com/embed.js';
@@ -136,6 +139,5 @@
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </body>
 </html>
