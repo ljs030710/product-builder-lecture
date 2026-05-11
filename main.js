@@ -7,6 +7,11 @@ class LottoGenerator extends HTMLElement {
         const wrapper = document.createElement('div');
         wrapper.setAttribute('class', 'wrapper');
 
+        const themeToggle = document.createElement('button');
+        themeToggle.setAttribute('class', 'theme-toggle');
+        themeToggle.textContent = '🌓 테마 변경';
+        themeToggle.addEventListener('click', () => this.toggleTheme());
+
         const title = document.createElement('h1');
         title.textContent = '로또 번호 생성기';
 
@@ -14,21 +19,59 @@ class LottoGenerator extends HTMLElement {
         numbersContainer.setAttribute('class', 'numbers-container');
 
         const button = document.createElement('button');
+        button.setAttribute('class', 'generate-btn');
         button.textContent = '번호 생성';
         button.addEventListener('click', () => this.generateNumbers(numbersContainer));
 
         const style = document.createElement('style');
         style.textContent = `
+            :host {
+                --bg-color: linear-gradient(to right, #6a11cb, #2575fc);
+                --text-color: white;
+                --number-bg: white;
+                --btn-shadow: rgba(0,0,0,0.2);
+            }
+            :host([theme="dark"]) {
+                --bg-color: #1a1a1a;
+                --text-color: #f0f0f0;
+                --number-bg: #333;
+                --btn-shadow: rgba(255,255,255,0.1);
+            }
+            :host([theme="light"]) {
+                --bg-color: #f7f7f7;
+                --text-color: #333;
+                --number-bg: white;
+                --btn-shadow: rgba(0,0,0,0.1);
+            }
             .wrapper {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 min-height: 100vh;
-                background: linear-gradient(to right, #6a11cb, #2575fc);
+                background: var(--bg-color);
+                color: var(--text-color);
                 font-family: 'Nanum Pen Script', cursive;
-                color: white;
                 text-align: center;
+                transition: background 0.3s ease, color 0.3s ease;
+                position: relative;
+            }
+            .theme-toggle {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid var(--text-color);
+                color: var(--text-color);
+                border-radius: 20px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-family: 'Nanum Pen Script', cursive;
+            }
+            .theme-toggle:hover {
+                background: rgba(255, 255, 255, 0.3);
             }
             h1 {
                 font-family: 'East Sea Dokdo', cursive;
@@ -50,16 +93,16 @@ class LottoGenerator extends HTMLElement {
                 width: 70px;
                 height: 70px;
                 border-radius: 50%;
-                background-color: white;
+                background-color: var(--number-bg);
                 font-size: 2.5rem;
                 font-weight: bold;
                 box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-                transition: transform 0.2s;
+                transition: transform 0.2s, background-color 0.3s ease;
             }
             .number:hover {
                 transform: translateY(-5px);
             }
-            button {
+            .generate-btn {
                 padding: 1rem 2rem;
                 border: none;
                 border-radius: 50px;
@@ -68,26 +111,55 @@ class LottoGenerator extends HTMLElement {
                 font-size: 1.5rem;
                 font-weight: bold;
                 cursor: pointer;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                box-shadow: 0 5px 15px var(--btn-shadow);
                 transition: all 0.3s ease;
                 font-family: 'Nanum Pen Script', cursive;
             }
-            button:hover {
-                box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            .generate-btn:hover {
+                box-shadow: 0 8px 25px var(--btn-shadow);
                 transform: translateY(-2px);
             }
-            button:active {
+            .generate-btn:active {
                 transform: translateY(1px);
             }
         `;
 
         shadow.appendChild(style);
         shadow.appendChild(wrapper);
+        wrapper.appendChild(themeToggle);
         wrapper.appendChild(title);
         wrapper.appendChild(numbersContainer);
         wrapper.appendChild(button);
 
+        this.initTheme();
         this.generateNumbers(numbersContainer);
+    }
+
+    initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'default';
+        if (savedTheme !== 'default') {
+            this.setAttribute('theme', savedTheme);
+        }
+    }
+
+    toggleTheme() {
+        const currentTheme = this.getAttribute('theme');
+        let nextTheme;
+
+        if (!currentTheme) {
+            nextTheme = 'dark';
+        } else if (currentTheme === 'dark') {
+            nextTheme = 'light';
+        } else {
+            nextTheme = 'default';
+        }
+
+        if (nextTheme === 'default') {
+            this.removeAttribute('theme');
+        } else {
+            this.setAttribute('theme', nextTheme);
+        }
+        localStorage.setItem('theme', nextTheme);
     }
 
     getColor(number) {
