@@ -132,7 +132,7 @@ class AnimalFaceTest extends HTMLElement {
                 </div>
                 <img id="preview-image" src="#" alt="your image" />
             </div>
-            <input type="file" id="file-input" accept="image/*" />
+            <input type="file" id="file-input" accept="image/*, .jpg, .jpeg, .png" />
             
             <div id="loading-text" class="loading-text" style="display: none;">AI가 분석 중입니다...</div>
             <div id="result-message" class="result-message"></div>
