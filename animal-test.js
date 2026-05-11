@@ -4,12 +4,10 @@ class AnimalFaceTest extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.model = null;
-        this.webcam = null;
         this.maxPredictions = 0;
         this.isModelLoading = false;
-        this.isWebcamStarted = false;
 
-        // Teachable Machine URL - Change this to your model URL
+        // Teachable Machine URL
         this.URL = "./my_model/"; 
     }
 
@@ -42,30 +40,51 @@ class AnimalFaceTest extends HTMLElement {
                 margin: 0 0 1.5rem 0;
                 color: #ff416c;
             }
-            #webcam-container {
-                margin: 1rem 0;
-                border-radius: 15px;
-                overflow: hidden;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                background: #eee;
-                width: 200px;
-                height: 200px;
+            .upload-area {
+                width: 100%;
+                max-width: 300px;
+                height: 300px;
+                border: 3px dashed #ccc;
+                border-radius: 20px;
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s;
+                position: relative;
+                overflow: hidden;
+                background: #f9f9f9;
             }
-            canvas {
-                width: 100% !important;
-                height: 100% !important;
+            .upload-area:hover {
+                border-color: #ff416c;
+                background: #fff0f3;
+            }
+            .upload-area img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: none;
+            }
+            .upload-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+            .upload-text {
+                font-size: 1.5rem;
+                color: #666;
+            }
+            #file-input {
+                display: none;
             }
             #label-container {
                 width: 100%;
-                margin-top: 1.5rem;
+                margin-top: 2rem;
             }
             .prediction-row {
                 display: flex;
                 align-items: center;
-                margin-bottom: 0.8rem;
+                margin-bottom: 1rem;
                 gap: 1rem;
             }
             .label-name {
@@ -75,131 +94,139 @@ class AnimalFaceTest extends HTMLElement {
             }
             .progress-bar {
                 flex-grow: 1;
-                height: 20px;
+                height: 24px;
                 background: #eee;
-                border-radius: 10px;
+                border-radius: 12px;
                 overflow: hidden;
             }
             .progress-fill {
                 height: 100%;
                 background: linear-gradient(to right, #ff416c, #ff4b2b);
                 width: 0%;
-                transition: width 0.2s ease;
+                transition: width 0.5s ease-out;
             }
             .percent {
-                width: 50px;
-                font-size: 1.2rem;
+                width: 60px;
+                font-size: 1.3rem;
                 font-weight: bold;
-            }
-            .start-btn {
-                padding: 1rem 3rem;
-                font-size: 1.8rem;
-                background: linear-gradient(to right, #6a11cb, #2575fc);
-                color: white;
-                border: none;
-                border-radius: 50px;
-                cursor: pointer;
-                font-family: 'Nanum Pen Script', cursive;
-                transition: transform 0.2s, box-shadow 0.2s;
-                margin-top: 1rem;
-            }
-            .start-btn:hover {
-                transform: scale(1.05);
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            }
-            .start-btn:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
             }
             .loading-text {
                 margin-top: 1rem;
                 font-size: 1.2rem;
                 color: #666;
             }
+            .result-message {
+                margin-top: 1.5rem;
+                font-size: 2rem;
+                font-weight: bold;
+                color: #2575fc;
+                text-align: center;
+            }
         </style>
         <div class="container">
-            <h2>인공지능 동물상 테스트</h2>
-            <div id="webcam-container">
-                <span id="placeholder-text">카메라 대기 중...</span>
+            <h2>AI 동물상 테스트</h2>
+            <div class="upload-area" id="upload-area">
+                <div id="upload-prompt">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">사진을 업로드 해주세요</div>
+                </div>
+                <img id="preview-image" src="#" alt="your image" />
             </div>
-            <button class="start-btn" id="start-btn">테스트 시작하기</button>
-            <div id="loading-text" class="loading-text" style="display: none;">모델을 불러오는 중입니다...</div>
+            <input type="file" id="file-input" accept="image/*" />
+            
+            <div id="loading-text" class="loading-text" style="display: none;">AI가 분석 중입니다...</div>
+            <div id="result-message" class="result-message"></div>
             <div id="label-container"></div>
         </div>
         `;
 
-        this.shadowRoot.getElementById('start-btn').addEventListener('click', () => this.init());
+        this.initEvents();
     }
 
-    async init() {
-        const startBtn = this.shadowRoot.getElementById('start-btn');
+    initEvents() {
+        const uploadArea = this.shadowRoot.getElementById('upload-area');
+        const fileInput = this.shadowRoot.getElementById('file-input');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+    }
+
+    async loadModel() {
+        if (this.model) return;
+        
         const loadingText = this.shadowRoot.getElementById('loading-text');
-        const placeholder = this.shadowRoot.getElementById('placeholder-text');
-
-        startBtn.disabled = true;
         loadingText.style.display = 'block';
-
+        
         try {
             const modelURL = this.URL + "model.json";
             const metadataURL = this.URL + "metadata.json";
-
             this.model = await tmImage.load(modelURL, metadataURL);
             this.maxPredictions = this.model.getTotalClasses();
-
-            const flip = true;
-            this.webcam = new tmImage.Webcam(200, 200, flip);
-            await this.webcam.setup();
-            await this.webcam.play();
-            
             loadingText.style.display = 'none';
-            placeholder.style.display = 'none';
-            this.shadowRoot.getElementById("webcam-container").appendChild(this.webcam.canvas);
-            
-            const labelContainer = this.shadowRoot.getElementById("label-container");
-            for (let i = 0; i < this.maxPredictions; i++) {
-                const row = document.createElement("div");
-                row.className = "prediction-row";
-                row.innerHTML = `
-                    <div class="label-name"></div>
-                    <div class="progress-bar"><div class="progress-fill"></div></div>
-                    <div class="percent">0%</div>
-                `;
-                labelContainer.appendChild(row);
-            }
-
-            this.isWebcamStarted = true;
-            window.requestAnimationFrame(() => this.loop());
         } catch (error) {
             console.error(error);
-            alert("모델을 불러오는데 실패했습니다. './my_model/' 폴더에 model.json, metadata.json, weights.bin 파일이 있는지 확인해주세요.");
-            startBtn.disabled = false;
             loadingText.style.display = 'none';
+            alert("모델 로드 실패: ./my_model/ 폴더를 확인해주세요.");
         }
     }
 
-    async loop() {
-        if (this.isWebcamStarted) {
-            this.webcam.update();
-            await this.predict();
-            window.requestAnimationFrame(() => this.loop());
-        }
+    async handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Preview Image
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const previewImage = this.shadowRoot.getElementById('preview-image');
+            const uploadPrompt = this.shadowRoot.getElementById('upload-prompt');
+            
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+            uploadPrompt.style.display = 'none';
+
+            await this.loadModel();
+            if (this.model) {
+                this.predict(previewImage);
+            }
+        };
+        reader.readAsDataURL(file);
     }
 
-    async predict() {
-        const prediction = await this.model.predict(this.webcam.canvas);
+    async predict(imageElement) {
+        const loadingText = this.shadowRoot.getElementById('loading-text');
+        loadingText.style.display = 'block';
+
+        // small delay to show loading
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const prediction = await this.model.predict(imageElement);
         const labelContainer = this.shadowRoot.getElementById("label-container");
+        const resultMessage = this.shadowRoot.getElementById("result-message");
         
-        for (let i = 0; i < this.maxPredictions; i++) {
-            const row = labelContainer.childNodes[i];
-            const name = row.querySelector('.label-name');
-            const fill = row.querySelector('.progress-fill');
-            const percent = row.querySelector('.percent');
+        labelContainer.innerHTML = '';
+        loadingText.style.display = 'none';
 
-            const prob = (prediction[i].probability * 100).toFixed(0);
-            name.textContent = this.translateLabel(prediction[i].className);
-            fill.style.width = prob + "%";
-            percent.textContent = prob + "%";
+        let topPrediction = { className: '', probability: 0 };
+
+        for (let i = 0; i < this.maxPredictions; i++) {
+            const prob = prediction[i].probability;
+            if (prob > topPrediction.probability) {
+                topPrediction = prediction[i];
+            }
+
+            const row = document.createElement("div");
+            row.className = "prediction-row";
+            const percentVal = (prob * 100).toFixed(0);
+            
+            row.innerHTML = `
+                <div class="label-name">${this.translateLabel(prediction[i].className)}</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: ${percentVal}%"></div></div>
+                <div class="percent">${percentVal}%</div>
+            `;
+            labelContainer.appendChild(row);
         }
+
+        resultMessage.textContent = `당신은 ${this.translateLabel(topPrediction.className)} 입니다!`;
     }
 
     translateLabel(label) {
