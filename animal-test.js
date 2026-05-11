@@ -5,13 +5,23 @@ class AnimalFaceTest extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.model = null;
         this.maxPredictions = 0;
-        // 모델 파일이 위치한 폴더 경로 (GitHub에 올릴 폴더 이름과 일치해야 함)
         this.URL = "./my_model/"; 
     }
 
     connectedCallback() {
         this.render();
-        this.loadModel(); // 접속 시 자동으로 모델 로드
+        this.loadModel(); 
+    }
+
+    async loadModel() {
+        try {
+            const modelURL = this.URL + "model.json";
+            const metadataURL = this.URL + "metadata.json";
+            this.model = await tmImage.load(modelURL, metadataURL);
+            this.maxPredictions = this.model.getTotalClasses();
+        } catch (error) {
+            console.error("Model load failed", error);
+        }
     }
 
     render() {
@@ -20,138 +30,177 @@ class AnimalFaceTest extends HTMLElement {
             :host {
                 display: block;
                 font-family: 'Nanum Pen Script', cursive;
-                color: var(--text-color, #333);
+                color: #333;
             }
             .container {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding: 2rem;
-                max-width: 600px;
+                padding: 3rem 1rem;
+                max-width: 500px;
                 margin: 0 auto;
-                background: var(--number-bg, white);
-                border-radius: 20px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                background: white;
+                border-radius: 30px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                min-height: 450px;
+                transition: all 0.5s ease;
             }
             h2 {
                 font-family: 'East Sea Dokdo', cursive;
-                font-size: 3.5rem;
-                margin: 0 0 1.5rem 0;
+                font-size: 4rem;
+                margin: 0 0 2rem 0;
                 color: #ff416c;
+                text-align: center;
             }
-            .upload-area {
-                width: 100%;
-                max-width: 300px;
-                height: 300px;
-                border: 3px dashed #ccc;
-                border-radius: 20px;
+            
+            /* Start View */
+            .view-start {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.3s;
-                position: relative;
-                overflow: hidden;
-                background: #f9f9f9;
+                gap: 2rem;
             }
-            .upload-area:hover {
-                border-color: #ff416c;
-                background: #fff0f3;
+            .main-icon {
+                font-size: 6rem;
+                animation: bounce 2s infinite;
             }
-            .upload-area img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                display: none;
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-20px); }
             }
-            .upload-icon {
-                font-size: 3rem;
-                margin-bottom: 1rem;
-            }
-            .upload-text {
-                font-size: 1.5rem;
-                color: #666;
-            }
-            .select-btn {
-                margin-top: 1.5rem;
-                padding: 0.8rem 2rem;
-                font-size: 1.5rem;
-                background: linear-gradient(to right, #6a11cb, #2575fc);
+            .start-btn {
+                padding: 1.2rem 4rem;
+                font-size: 2rem;
+                background: linear-gradient(to right, #ff416c, #ff4b2b);
                 color: white;
                 border: none;
                 border-radius: 50px;
                 cursor: pointer;
                 font-family: 'Nanum Pen Script', cursive;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                box-shadow: 0 10px 20px rgba(255, 65, 108, 0.3);
+                transition: all 0.3s;
             }
-            #file-input {
+            .start-btn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 15px 30px rgba(255, 65, 108, 0.4);
+            }
+
+            /* Loading View */
+            .view-loading {
                 display: none;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 1.5rem;
+                margin-top: 4rem;
             }
-            #label-container {
+            .loader {
+                border: 8px solid #f3f3f3;
+                border-top: 8px solid #ff416c;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            /* Result View */
+            .view-result {
+                display: none;
+                flex-direction: column;
+                align-items: center;
                 width: 100%;
-                margin-top: 2rem;
             }
-            .prediction-row {
+            .result-photo {
+                width: 250px;
+                height: 250px;
+                border-radius: 20px;
+                object-fit: cover;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                margin-bottom: 2rem;
+            }
+            .result-title {
+                font-size: 3rem;
+                font-weight: bold;
+                color: #2575fc;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+            .result-bar-container {
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+            .bar-row {
                 display: flex;
                 align-items: center;
-                margin-bottom: 1rem;
                 gap: 1rem;
+                margin-bottom: 0.8rem;
             }
-            .label-name {
+            .bar-label {
                 width: 80px;
                 font-size: 1.5rem;
                 text-align: right;
             }
-            .progress-bar {
+            .bar-bg {
                 flex-grow: 1;
-                height: 24px;
+                height: 20px;
                 background: #eee;
-                border-radius: 12px;
+                border-radius: 10px;
                 overflow: hidden;
             }
-            .progress-fill {
+            .bar-fill {
                 height: 100%;
-                background: linear-gradient(to right, #ff416c, #ff4b2b);
+                background: #ff416c;
                 width: 0%;
-                transition: width 0.5s ease-out;
+                transition: width 1s ease-out;
             }
-            .percent {
-                width: 60px;
-                font-size: 1.3rem;
-                font-weight: bold;
+            .retry-btn {
+                padding: 0.8rem 2.5rem;
+                font-size: 1.5rem;
+                background: #eee;
+                color: #555;
+                border: none;
+                border-radius: 50px;
+                cursor: pointer;
+                font-family: 'Nanum Pen Script', cursive;
+                transition: all 0.3s;
             }
-            .status-text {
-                margin-top: 1rem;
-                font-size: 1.2rem;
-                color: #666;
+            .retry-btn:hover {
+                background: #ddd;
             }
-            .result-message {
-                margin-top: 1.5rem;
-                font-size: 2.2rem;
-                font-weight: bold;
-                color: #2575fc;
-                text-align: center;
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+
+            input[type="file"] {
+                display: none;
             }
         </style>
-        <div class="container">
-            <h2>AI 동물상 테스트</h2>
-            <div id="status-text" class="status-text">모델을 준비 중입니다...</div>
+        
+        <div class="container" id="main-container">
+            <h2>내 동물상 찾기</h2>
             
-            <div class="upload-area" id="upload-area">
-                <div id="upload-prompt">
-                    <div class="upload-icon">📸</div>
-                    <div class="upload-text">사진을 드래그하거나 클릭하세요</div>
-                </div>
-                <img id="preview-image" src="#" alt="your image" />
+            <!-- Step 1: Start -->
+            <div id="view-start" class="view-start">
+                <div class="main-icon">🐶😸</div>
+                <button class="start-btn" id="start-btn">사진 선택하고 시작하기</button>
             </div>
-            
-            <button class="select-btn" id="select-btn">사진 선택하기</button>
-            <input type="file" id="file-input" accept="image/*, .jpg, .jpeg, .png" />
-            
-            <div id="result-message" class="result-message"></div>
-            <div id="label-container"></div>
+
+            <!-- Step 2: Loading -->
+            <div id="view-loading" class="view-loading">
+                <div class="loader"></div>
+                <div style="font-size: 1.8rem;">분석 중입니다...</div>
+            </div>
+
+            <!-- Step 3: Result -->
+            <div id="view-result" class="view-result">
+                <img id="result-photo" class="result-photo" src="" alt="uploaded photo" />
+                <div id="result-text" class="result-title"></div>
+                <div id="bar-container" class="result-bar-container"></div>
+                <button class="retry-btn" id="retry-btn">다시 하기</button>
+            </div>
+
+            <input type="file" id="file-input" accept="image/*" />
         </div>
         `;
 
@@ -159,94 +208,87 @@ class AnimalFaceTest extends HTMLElement {
     }
 
     initEvents() {
-        const uploadArea = this.shadowRoot.getElementById('upload-area');
-        const selectBtn = this.shadowRoot.getElementById('select-btn');
+        const startBtn = this.shadowRoot.getElementById('start-btn');
+        const retryBtn = this.shadowRoot.getElementById('retry-btn');
         const fileInput = this.shadowRoot.getElementById('file-input');
 
-        const triggerUpload = () => fileInput.click();
-        
-        uploadArea.addEventListener('click', triggerUpload);
-        selectBtn.addEventListener('click', triggerUpload);
-        fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        startBtn.addEventListener('click', () => fileInput.click());
+        retryBtn.addEventListener('click', () => this.switchView('start'));
+        fileInput.addEventListener('change', (e) => this.handleFile(e));
     }
 
-    async loadModel() {
-        const statusText = this.shadowRoot.getElementById('status-text');
-        try {
-            const modelURL = this.URL + "model.json";
-            const metadataURL = this.URL + "metadata.json";
-            
-            this.model = await tmImage.load(modelURL, metadataURL);
-            this.maxPredictions = this.model.getTotalClasses();
-            statusText.textContent = "✅ AI가 준비되었습니다! 사진을 올려주세요.";
-            statusText.style.color = "#4caf50";
-        } catch (error) {
-            console.error(error);
-            statusText.innerHTML = `
-                <span style="color: #f44336;">❌ 모델 파일을 찾을 수 없습니다.</span><br>
-                <small>개발자님: 'my_model' 폴더에 model.json, weights.bin 파일이 있는지 확인해주세요.</small>
-            `;
+    switchView(view) {
+        const start = this.shadowRoot.getElementById('view-start');
+        const loading = this.shadowRoot.getElementById('view-loading');
+        const result = this.shadowRoot.getElementById('view-result');
+
+        start.style.display = view === 'start' ? 'flex' : 'none';
+        loading.style.display = view === 'loading' ? 'flex' : 'none';
+        result.style.display = view === 'result' ? 'flex' : 'none';
+
+        if (view === 'start') {
+            this.shadowRoot.getElementById('file-input').value = '';
         }
     }
 
-    async handleFileUpload(event) {
+    async handleFile(event) {
         const file = event.target.files[0];
-        if (!file || !this.model) return;
+        if (!file) return;
 
         const reader = new FileReader();
         reader.onload = async (e) => {
-            const previewImage = this.shadowRoot.getElementById('preview-image');
-            const uploadPrompt = this.shadowRoot.getElementById('upload-prompt');
+            this.switchView('loading');
             
-            previewImage.src = e.target.result;
-            previewImage.style.display = 'block';
-            uploadPrompt.style.display = 'none';
-
-            this.predict(previewImage);
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = async () => {
+                if (!this.model) await this.loadModel();
+                
+                // Show analysis feel
+                await new Promise(r => setTimeout(r, 1500));
+                this.analyze(img);
+            };
         };
         reader.readAsDataURL(file);
     }
 
-    async predict(imageElement) {
-        const statusText = this.shadowRoot.getElementById('status-text');
-        statusText.textContent = "AI가 분석 중...";
-
-        const prediction = await this.model.predict(imageElement);
-        const labelContainer = this.shadowRoot.getElementById("label-container");
-        const resultMessage = this.shadowRoot.getElementById("result-message");
-        
-        labelContainer.innerHTML = '';
-        statusText.textContent = "분석 완료!";
-
-        let topPrediction = { className: '', probability: 0 };
-
-        for (let i = 0; i < this.maxPredictions; i++) {
-            const prob = prediction[i].probability;
-            if (prob > topPrediction.probability) {
-                topPrediction = prediction[i];
-            }
-
-            const row = document.createElement("div");
-            row.className = "prediction-row";
-            const percentVal = (prob * 100).toFixed(0);
-            
-            row.innerHTML = `
-                <div class="label-name">${this.translateLabel(prediction[i].className)}</div>
-                <div class="progress-bar"><div class="progress-fill" style="width: ${percentVal}%"></div></div>
-                <div class="percent">${percentVal}%</div>
-            `;
-            labelContainer.appendChild(row);
+    async analyze(imgElement) {
+        if (!this.model) {
+            alert("서비스를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.");
+            this.switchView('start');
+            return;
         }
 
-        resultMessage.textContent = `당신은 ${this.translateLabel(topPrediction.className)} 입니다!`;
+        const prediction = await this.model.predict(imgElement);
+        const resultPhoto = this.shadowRoot.getElementById('result-photo');
+        const resultText = this.shadowRoot.getElementById('result-text');
+        const barContainer = this.shadowRoot.getElementById('bar-container');
+
+        resultPhoto.src = imgElement.src;
+        barContainer.innerHTML = '';
+
+        let top = { className: '', probability: 0 };
+        prediction.forEach(p => {
+            if (p.probability > top.probability) top = p;
+
+            const prob = (p.probability * 100).toFixed(0);
+            const row = document.createElement('div');
+            row.className = 'bar-row';
+            row.innerHTML = `
+                <div class="bar-label">${this.translate(p.className)}</div>
+                <div class="bar-bg"><div class="bar-fill" style="width: ${prob}%"></div></div>
+                <div style="width: 50px; font-size: 1.2rem;">${prob}%</div>
+            `;
+            barContainer.appendChild(row);
+        });
+
+        resultText.textContent = `당신은 '${this.translate(top.className)}' 입니다!`;
+        this.switchView('result');
     }
 
-    translateLabel(label) {
-        const translations = {
-            'dog': '강아지상',
-            'cat': '고양이상'
-        };
-        return translations[label.toLowerCase()] || label;
+    translate(label) {
+        const map = { 'dog': '강아지상', 'cat': '고양이상' };
+        return map[label.toLowerCase()] || label;
     }
 }
 
