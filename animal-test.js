@@ -5,7 +5,7 @@ class AnimalFaceTest extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.model = null;
         this.maxPredictions = 0;
-        this.URL = "https://teachablemachine.withgoogle.com/models/p-vS6Yw4p/"; 
+        this.URL = "https://teachablemachine.withgoogle.com/models/vz9jWJSXA/"; 
     }
 
     connectedCallback() {
